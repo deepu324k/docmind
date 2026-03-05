@@ -7,7 +7,7 @@ import os
 import json
 import numpy as np
 import faiss
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 # Global model instance (loaded once)
 _model = None
@@ -16,18 +16,18 @@ SESSIONS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 
 
 def _get_model():
-    """Load the sentence-transformer model (singleton)."""
+    """Load the fastembed model (singleton)."""
     global _model
     if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        _model = TextEmbedding("BAAI/bge-small-en-v1.5")
     return _model
 
 
 def generate_embeddings(texts):
     """Generate embeddings for a list of texts."""
     model = _get_model()
-    embeddings = model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
-    return embeddings.astype("float32")
+    embeddings = list(model.embed(texts))
+    return np.array(embeddings, dtype="float32")
 
 
 def create_index(chunks, session_id):
@@ -124,5 +124,5 @@ def load_index(session_id):
 def embed_query(query):
     """Embed a single query string."""
     model = _get_model()
-    embedding = model.encode([query], convert_to_numpy=True)
-    return embedding.astype("float32")
+    embedding = list(model.embed([query]))
+    return np.array(embedding, dtype="float32")
