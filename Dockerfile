@@ -17,6 +17,6 @@ COPY . .
 # Create sessions directory
 RUN mkdir -p sessions
 
-EXPOSE $PORT
+EXPOSE 8080
 
-CMD gunicorn app:app --workers 1 --timeout 120 --bind 0.0.0.0:$PORT
+CMD gunicorn app:app --workers 1 --timeout 120 --bind 0.0.0.0:${PORT:-8080}
