@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run DocuMind",
+      "type": "shell",
+      "command": "\"C:\\Users\\ASUS\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\" app.py",
+      "options": {
+        "cwd": "D:\\documind"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting DocuMind",
+          "endsPattern": "Running on http"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}
