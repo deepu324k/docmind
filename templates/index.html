@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuMind — AI Document Intelligence</title>
+    <meta name="description" content="Upload PDFs and chat with your documents using AI-powered retrieval-augmented generation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- ═══ Animated background ═══ -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ═══ Main App Shell ═══ -->
+    <div class="app-container">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <circle cx="12" cy="15" r="3"/>
+                            <path d="M12 12v-1"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">DocuMind</span>
+                </div>
+            </div>
+
+            <button class="btn-new-session" id="btnNewSession">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                New Session
+            </button>
+
+            <div class="sessions-list" id="sessionsList">
+                <div class="sessions-label">Previous Sessions</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-badge">RAG-Powered AI</div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="main-content">
+
+            <!-- ── Top Bar ── -->
+            <header class="top-bar">
+                <button class="btn-toggle-sidebar" id="btnToggleSidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div class="session-info" id="sessionInfo">
+                    <span class="session-label">No documents loaded</span>
+                </div>
+            </header>
+
+            <!-- ── Upload Panel (shown when no session) ── -->
+            <div class="upload-panel" id="uploadPanel">
+                <div class="upload-hero">
+                    <div class="upload-icon-wrapper">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <path d="M12 18v-6"/>
+                            <path d="M9 15l3-3 3 3"/>
+                        </svg>
+                    </div>
+                    <h1 class="upload-title">Upload your documents</h1>
+                    <p class="upload-subtitle">Drop PDFs here to start chatting with your documents using AI</p>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept=".pdf" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="drop-zone-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17,8 12,3 7,8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <p class="drop-zone-text">Drag & drop PDF files here</p>
+                        <p class="drop-zone-hint">or click to browse</p>
+                    </div>
+                </div>
+
+                <div class="file-list" id="fileList" style="display:none;"></div>
+
+                <button class="btn-upload" id="btnUpload" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17,8 12,3 7,8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>Process Documents</span>
+                </button>
+
+                <div class="upload-progress" id="uploadProgress" style="display:none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Smart Search</h3>
+                        <p>AI-powered semantic search across all your documents</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3>Natural Chat</h3>
+                        <p>Ask questions in plain English and get cited answers</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Data Extraction</h3>
+                        <p>Auto-detect tables, invoices, and structured data</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📄</div>
+                        <h3>Multi-Doc</h3>
+                        <p>Upload multiple PDFs and search across all of them</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Chat Panel (shown after upload) ── -->
+            <div class="chat-panel" id="chatPanel" style="display:none;">
+
+                <!-- Structured Data Card -->
+                <div class="data-card" id="dataCard" style="display:none;">
+                    <div class="data-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 3v18"/>
+                        </svg>
+                        <span>Extracted Data</span>
+                        <button class="btn-close-card" id="btnCloseCard">×</button>
+                    </div>
+                    <div class="data-card-body" id="dataCardBody"></div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4"/>
+                                <path d="M12 8h.01"/>
+                            </svg>
+                        </div>
+                        <h2>Documents loaded!</h2>
+                        <p>Ask any question about your uploaded documents. I'll find the relevant sections and provide cited answers.</p>
+                        <div class="suggestion-chips" id="suggestionChips">
+                            <button class="chip" data-question="What is this document about?">What is this document about?</button>
+                            <button class="chip" data-question="Summarize the key points">Summarize the key points</button>
+                            <button class="chip" data-question="What are the main conclusions?">What are the main conclusions?</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea class="chat-input" id="chatInput" placeholder="Ask a question about your documents..." rows="1"></textarea>
+                        <button class="btn-send" id="btnSend" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22,2 15,22 11,13 2,9"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="chat-disclaimer">DocuMind provides answers based on your uploaded documents. Always verify important information.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing your documents...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
